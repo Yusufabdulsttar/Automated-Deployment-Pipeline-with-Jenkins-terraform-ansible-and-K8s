@@ -6,6 +6,7 @@
     - gnupg
     - lsb-release
     - apt-transport-https
+    - software-properties-common
     state: latest
     update_cache: yes
 
@@ -15,13 +16,25 @@
     state: directory
     mode: 0755
 
-- name: Add Docker GPG key
+#- name: Add Docker GPG key
+#  apt_key:
+#    url: https://download.docker.com/linux/ubuntu/gpg
+
+
+- name: Copy Docker GPG key to target machine
+  copy:
+    src: /tmp/docker.gpg
+    dest: /tmp/docker.gpg
+
+- name: Add Docker GPG key to APT
   apt_key:
-    url: https://download.docker.com/linux/ubuntu/gpg
+    file: /tmp/docker.gpg
+    state: present
 
 - name: Add Docker APT repository
   apt_repository:
     repo: deb [arch=amd64] https://download.docker.com/{{ ansible_system | lower }}/{{ ansible_distribution | lower }} {{ ansible_distribution_release }} stable
+
 
 - name: install containerd
   apt:
